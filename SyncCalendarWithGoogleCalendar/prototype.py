@@ -1,7 +1,7 @@
 import pandas as pd
 from openpyxl import load_workbook
 import math
-
+from datetime import datetime, timedelta
 folderEvent = 'Book1.xlsx'
 folderName = 'Book2.xlsx'
 dataEvent = pd.read_excel(folderEvent,sheet_name = 'Sheet1')
@@ -31,8 +31,39 @@ def insertClassName(dataEvent, nameEvent):#hàm này sử dụng để chèn th�
 
 insertClassName(dataEvent, nameEvent)
 print(dataEvent)
-             
 
+dateBegin = datetime(2021,2,22) 
+weekBegin = 28 
+weekEnd = 48
+
+def processLearningWeek(ls,week):
+    if (ls.find('-') != -1):
+        ls = ls.split('-')
+        if (week >= int(ls[0]) and week <= int(ls[1])):
+            return True
+        else: 
+            return False
+    else:
+        if (ls.find(str(week)) != -1):
+            return True
+        else: 
+            return False
+
+
+def processDateEvent(event,dateBegin,week):
+    print(week)
+    for count in range (0,len(event)):
+        row = event.iloc[count]
+        if (processLearningWeek(row['Tuần học'],week)):
+            print(row['Tên lớp'],row['Thời gian'],row['Phòng học'],dateBegin)
+
+for weekBegin in range(28,44):
+    for day in range(2,7):
+        event = dataEvent[dataEvent['Thứ'] == day]
+        if (not (event.empty)):
+            processDateEvent(event,dateBegin,weekBegin)
+        dateBegin+= timedelta(days=1)
+    dateBegin+=timedelta(days=2)
 
 
 '''
@@ -46,6 +77,8 @@ các thuộc tính cần quan tâm
     lặp sự kiện sẽ sử dụng  tuần học để có thể lạp được
 - công việc đầu tiên là phải sync được mã lớp và lấy được tên mã lớp
     đã xong việc link mã lớp và tên lớp
+- công việc việc tiếp theo là phải tạo ra được những sự kiện từ để có thể up lên google calendar theo tuần học
+    đã xong việc còn lại là link api và phần xử lý số liệu này nữa là được
 '''
 
 
