@@ -3,7 +3,7 @@ import os as os
 import numpy as np
 from openpyxl import load_workbook
 
-folder = 'tkb.xlsx'
+folder = 'tbk.xlsx'
 target = open("mhp.txt","r")
 ls = []
 
@@ -18,10 +18,11 @@ print(ls)
 
 data = pd.read_excel(folder,sheet_name = 'Sheet1')
 
-temp = data[data['Mã_HP'] == ls[0]]
+temp = data[data['mhp'] == (ls[0])]
 
 for i in range(1,len(ls)):
-    temp = temp.append(data[data['Mã_HP'] == ls[i]])
+    if (len(ls[i]) !=0):
+        temp = temp.append(data[ data['mhp'] == (ls[i])])
 
 temp.to_excel(r'result.xlsx','Sheet1')
 
