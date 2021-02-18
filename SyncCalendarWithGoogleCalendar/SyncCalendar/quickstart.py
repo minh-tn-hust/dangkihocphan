@@ -5,7 +5,10 @@ import pickle
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -23,13 +26,14 @@ if not creds or not creds.valid:
         creds.refresh(Request())
     else:
         flow = InstalledAppFlow.from_client_secrets_file(
-            'credentials.json', SCOPES)
-        creds = flow.run_local_server(port=0)
+            'credentials.json', SCOPES,redirect_uri='urn:ietf:wg:oauth:2.0:oob')
+        creds = flow.run_console();
     # Save the credentials for the next run
     with open('token.pickle', 'wb') as token:
         pickle.dump(creds, token)
 
 service = build('calendar', 'v3', credentials=creds)
+
     # Call the Calendar API
 # Tới đây là đã xong xuôi phần key rồi 
 
@@ -52,7 +56,7 @@ def processColumn(data): # hàm dùng để lọc những cột mà không chứ
 processColumn(dataEvent)
 processColumn(nameEvent)
 
-def insertClassName(dataEvent, nameEvent):#hàm này sử dụng để chèn thêm tên lớp vào kèm cùng với mã lớp
+def insertClassName(dataEvent, nameEvent):#hàm này sử dụng để chèn thêm tên lớp vào kèm cùng với mã lớp và loại lớp 
     className = [] 
     typeClass = []
     classCode = dataEvent['Lớp học']
@@ -127,9 +131,7 @@ def processDateEvent(event,dateBegin,week):
             }
             events = service.events().insert(calendarId='primary', body=events).execute()
 
-
-
-for weekBegin in range(28,44):
+for weekBegin in range(25,44):
     for day in range(2,7):
         event = dataEvent[dataEvent['Thứ'] == day]
         if (not (event.empty)):

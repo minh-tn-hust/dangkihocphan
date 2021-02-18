@@ -2,6 +2,7 @@ import pandas as pd
 from openpyxl import load_workbook
 import math
 from datetime import datetime, timedelta
+
 folderEvent = 'Book1.xlsx'
 folderName = 'Book2.xlsx'
 dataEvent = pd.read_excel(folderEvent,sheet_name = 'Sheet1')
@@ -17,15 +18,20 @@ processColumn(nameEvent)
 
 def insertClassName(dataEvent, nameEvent):#hàm này sử dụng để chèn thêm tên lớp vào kèm cùng với mã lớp
     className = [] 
+    typeClass = []
     classCode = dataEvent['Lớp học']
     for code in classCode:
         if math.isnan(code):#kiểm tra xem có phải là NaN hay không, nếu phải thì next
             continue;
         else:
             x = nameEvent[nameEvent['Mã lớp'] == code]['Tên lớp']
+            y = nameEvent[nameEvent['Mã lớp'] == code]['Loại lớp']
             if (x.empty):
                 x = nameEvent[nameEvent['Mã lớp kèm'] == code]['Tên lớp']
-            className.insert(len(className),x.values[0])
+                y = nameEvent[nameEvent['Mã lớp kèm'] == code]['Loại lớp']
+                className.insert(len(className),y.values[0] + ':' +x.values[0])
+            else:
+                className.insert(len(className),y.values[0] + ':' +x.values[0])
     cN = pd.DataFrame(className) #convert về cùng là DataFrame mới có thể thêm vào được
     dataEvent.insert(1,"Tên lớp",cN)
 
@@ -55,7 +61,7 @@ def processDateEvent(event,dateBegin,week):
     for count in range (0,len(event)):
         row = event.iloc[count]
         if (processLearningWeek(row['Tuần học'],week)):
-            print(row['Tên lớp'],row['Thời gian'],row['Phòng học'],dateBegin)
+            print(row['Tên lớp'],row['Thời gian'].split('-'),row['Phòng học'],dateBegin)
 
 for weekBegin in range(28,44):
     for day in range(2,7):
